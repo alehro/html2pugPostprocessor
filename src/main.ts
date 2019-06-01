@@ -1,3 +1,23 @@
+
+import * as fs from 'fs';
+//console.log('Hiiiiii');
+
+let html = fs.readFileSync(`C:\\work\\my\\Pug\\html2pugPostprocessor\\test\\inputFiles\\f1.html`, 'utf-8');
+let rss = html.match(/[\w,\d,-]+/g);
+let uniqueHtml = [];
+rss.forEach((i)=>{
+  if(!uniqueHtml.find(j=>{
+    return j== i;
+  } )){
+    uniqueHtml.push(i);
+  }
+})
+//let pug = fs.readFileSync(`C:\\work\\my\\Pug\\html2pugPostprocessor\\test\\inputFiles\\f1.pug`, 'utf-8');
+console.log(uniqueHtml)
+
+
+
+
 /**
  * Some predefined delays (in milliseconds).
  */
@@ -31,3 +51,4 @@ export async function greeter(name) {
   // tslint:disable-next-line no-unsafe-any no-return-await
   return await delayedHello(name, Delays.Long);
 }
+
