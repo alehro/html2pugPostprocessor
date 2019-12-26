@@ -1,19 +1,83 @@
 
 import * as fs from 'fs';
-//console.log('Hiiiiii');
+import * as program from "commander";
+//var program = require('commander');
 
-let html = fs.readFileSync(`C:\\work\\my\\Pug\\html2pugPostprocessor\\test\\inputFiles\\f1.html`, 'utf-8');
-let rss = html.match(/[\w,\d,-]+/g);
-let uniqueHtml = [];
-rss.forEach((i)=>{
-  if(!uniqueHtml.find(j=>{
-    return j== i;
-  } )){
-    uniqueHtml.push(i);
+if(process.argv.length<4){
+  console.log("Please specify html file as first argument and pug file to correct as second argument");       
+  throw "Invalid arguments";
+}
+
+let inPath =process.argv[2];
+let outPath = process.argv[3];
+// program
+//   .version('0.0.1')
+//   .command('<in1> <out1>')
+//   .action(((in1, out1)=>{
+//     inPath = in1;
+//     outPath = out1;
+//   }))
+//   .parse(process.argv);
+
+
+var correctFiles = (hPath, pPath) => {
+  //console.log('Hiiiiii');
+  let uniqueHtml = [];
+  //let htmlPath = `C:\\work\\my\\Pug\\html2pugPostprocessor\\test\\inputFiles\\f1.html`;
+  {
+    let html = fs.readFileSync(hPath, 'utf-8');
+    let rss = html.match(/[\w,\d,-]+/g);
+    rss.forEach((i) => {
+      if (!uniqueHtml.find(j => {
+        return j == i;
+      })) {
+        uniqueHtml.push(i);
+      }
+    })
+    //let pug = fs.readFileSync(`C:\\work\\my\\Pug\\html2pugPostprocessor\\test\\inputFiles\\f1.pug`, 'utf-8');
+    //console.log("unique htmls: \n"+uniqueHtml)
   }
-})
-//let pug = fs.readFileSync(`C:\\work\\my\\Pug\\html2pugPostprocessor\\test\\inputFiles\\f1.pug`, 'utf-8');
-console.log(uniqueHtml)
+  let uniquePug = [];
+  let pug = fs.readFileSync(pPath, 'utf-8');
+
+  {
+    let rss = pug.match(/[\w,\d,-]+/g);
+    rss.forEach((i) => {
+      if (!uniquePug.find(j => {
+        return j == i;
+      })) {
+        uniquePug.push(i);
+      }
+    })
+    //let pug = fs.readFileSync(`C:\\work\\my\\Pug\\html2pugPostprocessor\\test\\inputFiles\\f1.pug`, 'utf-8');
+    //console.log("unique pugs: \n"+uniquePug)
+  }
+  let differentCase = [];
+  uniqueHtml.forEach((htmlWithCase: string) => {
+    let suspitiousPug = uniquePug.find(i => i == htmlWithCase.toLowerCase());
+    if (suspitiousPug && suspitiousPug != htmlWithCase) {
+      differentCase.push({ case: htmlWithCase, nocase: htmlWithCase.toLowerCase() });
+    }
+  });
+  console.log("Words to be corrected: \n" + differentCase);
+
+  let res = pug;
+  differentCase.forEach((i) => {
+    console.log(`Search ${i.nocase}, replace ${i.case}`)
+    res = res.replace(i.nocase, i.case);
+  })
+  fs.writeFileSync(pPath, res);
+  //console.log("Corrected content: \n" + res);
+}
+
+correctFiles(inPath, outPath);
+
+
+
+
+
+
+
 
 
 
